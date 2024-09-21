@@ -1,0 +1,39 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} {% endblock %}</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="http://127.0.0.1:9000/rippic/siteicon.jpg"/>
+</head>
+<body>
+
+    {% if title == 'spares' %}
+        <link rel="stylesheet" type="text/css" href="{% static 'spares.css' %}">
+    {% elif title == 'spare' %}
+        <link rel="stylesheet" type="text/css" href="{% static 'spare.css' %}">
+    {% elif title == 'order' %}
+        <link rel="stylesheet" type="text/css" href="{% static 'order.css' %}">
+    {% endif %}
+
+    <header>
+
+        <div class="djet_div">
+            <img class="djet_pic" src="http://127.0.0.1:9000/rippic/djet.jpg"/>
+        </div>
+
+        <div class="navi">
+            <a href="{% url 'spares' %}">
+                <img class="main_icon" src="http://127.0.0.1:9000/rippic/siteicon.jpg">
+            </a>
+            <p class="headText">Мировые запчасти</p>
+        </div>
+
+    </header>
+
+    {% block content %}{% endblock %}
+
+</body>
+</html>

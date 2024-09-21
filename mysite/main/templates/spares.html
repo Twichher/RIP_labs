@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Мировые запчасти{% endblock %}
+
+{% block content %}
+
+    <div class="sort_by_price_div">
+
+        <form action="{% url 'spares' %}" class="form_search_spares"  method="GET" enctype="multipart/form-data">
+            {% csrf_token %}
+            <p class="price_by_text">Поиск по цене: от</p>
+            <input name="price_by" placeholder="Цена от" type="number" class="input_sort_by" value={{ price_by }}>
+            <p class="price_up_text">до</p>
+            <input name="price_up" placeholder="Цена до" type="number" class="input_sort_up" value={{ price_up }}>
+            <input type="submit" value="Найти" class="sort_btn">
+        </form>
+    </div>
+
+    <div class="order_div">    
+        <a href="{% url 'order' id_order  %}" class="order_a">
+            <div class="btn_order">
+                <p class="nameorder">Корзина:{{ count_in_order }}</p>
+                <img class="img_bucket" src="http://127.0.0.1:9000/rippic/basketicon.jpg">
+            </div>
+        </a>
+    </div>
+
+
+
+    <div class="space">
+
+        <div class="container">
+
+            {% for var in spares %}
+
+            <div class="spares_div">
+                <div class="spare_pic_div">
+                    <a href="{% url 'spare' var.id %}">
+                        <img class="spare_pic" src="{{ var.img }}">
+                    </a>
+                </div>
+                <div class="spare_name_div">
+                    <a class="spare_desc" href="{% url 'spare' var.id %}">
+                        {{ var.name_spare }}
+                    </a>
+                </div>
+                <div class="spare_price_div">
+                    <p class="spare_price">{{ var.price }} ₽</p>
+                </div>
+
+            </div>
+
+            {% empty %}
+
+            <p>Список пуст</p>
+
+            {% endfor %}
+
+        </div>
+    </div>
+
+    <div class="texttest">
+        
+    </div> 
+
+{% endblock%}

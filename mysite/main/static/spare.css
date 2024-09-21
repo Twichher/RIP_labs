@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+*{
+    margin: 0;
+    padding: 0;
+    font-family: 'Source Code Pro', sans-serif;
+    color: #000000; 
+
+}
+
+body{
+    background: #333333;
+}
+
+/* .header{
+    position: sticky;
+    top: 0px;
+} */
+
+.djet_div{
+    justify-content: center; 
+    display: flex;
+}
+
+.djet_pic{
+    border-top-left-radius: 20px; 
+    border-top-right-radius: 20px;
+    width: 800px;
+    height: 200px;
+}
+
+.navi{
+    width: 800px;
+    height: 50px;
+    background-color: #002147;
+    margin: 0 auto;
+    border-bottom-left-radius: 20px; 
+    border-bottom-right-radius: 20px;
+    justify-content: left;
+    display: flex;
+}
+
+.main_icon {
+    margin-left: 20px;
+    margin-top: 5px;
+    width: 40px;
+    height: 40px;
+}
+
+.headText{
+    color: #87CEEB;
+    margin-left: 20px;
+    font-size: 30px; 
+    margin-top: auto; 
+    margin-bottom: auto;
+}
+
+
+.descce_div{
+    width: 700px;
+    height: 400px;
+    background-color: #868686;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 15px;
+    border-radius: 20px;
+
+}
+
+.name_spare_div{
+    display: flex;
+    justify-content: center;
+}
+
+.name_spare{
+    color: black; 
+    font-size: 30px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.pic_spare_div{
+    margin-top: 15px;
+    margin-left: 15px;
+}
+
+.pic_spare{
+    width: 250px;
+    height: 200px;
+    border-radius: 20px;
+}
+
+.price_spare_div{
+    width: 150px;
+    position: relative;
+    bottom: 180px;
+    margin-left: 300px;
+}
+
+.price_spare{
+    color: red;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.desc_spare_div{
+    position: relative;
+    bottom: 150px;
+    margin-left: 300px;
+
+}
+
+.desc_spare{
+    font-size: 20px;
+    color: #FFFFFF;
+}
+
+.texttest{
+    margin-top: 30px;
+}

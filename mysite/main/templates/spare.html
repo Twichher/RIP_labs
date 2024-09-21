@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Мировые запчасти{% endblock %}
+
+{% block content %}
+
+
+    <div class="descce_div">
+
+        <div class="name_spare_div">
+            <p class="name_spare">{{ spares.name_spare }}</p>
+        </div>
+        
+        <div class="pic_spare_div">
+            <img class="pic_spare" src="{{ spares.img }}">
+        </div>
+
+        <div class="price_spare_div">
+            <p class="price_spare">{{ spares.price }} ₽</p>
+        </div>
+
+        <div class="desc_spare_div">
+            <p class="desc_spare">{{ spares.desc }}</p>
+        </div>
+            
+    </div>
+
+
+    </div>  
+
+        <div class="texttest">
+    
+    </div> 
+
+{% endblock %}

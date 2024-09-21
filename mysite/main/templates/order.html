@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Мировые запчасти{% endblock %}
+
+{% block content %}
+
+    <div class="order_num_div">
+        <p class="order_num">Заказ №{{ id }}</p>
+    </div>
+
+    <div class="date_place_div">
+        <p class="order_date">Заказ на: {{ date_for }}</p>
+        <p class="order_place">Адрес доставки: {{ place_for }}</p>
+    </div>
+
+    {% comment %} <div class="place">
+
+    </div> {% endcomment %}
+
+    <div class="order_items_div">
+
+        {% for var in items %}
+
+        <div class="items_div">
+
+            <img class="img_item" src="{{ var.info.img }}">
+
+            <p class="name_item">{{ var.info.name_spare }}</p>
+            <p class="price_item">{{ var.count }} шт.</p>
+            <p class="price_item">{{ var.info.price }}</p>
+
+        </div>
+
+        {% endfor %}
+
+
+    </div>
+
+    <div class="texttest">
+    
+    </div> 
+
+{% endblock %}
