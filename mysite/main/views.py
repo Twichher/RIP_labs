@@ -146,6 +146,7 @@ def spare(request, id):
         'title': 'spare',
         'spares': get_spares(id),
     }
+    
 
     return render(request, 'spare.html', spare)
 
