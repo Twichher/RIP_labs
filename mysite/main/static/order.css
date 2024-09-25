@@ -64,14 +64,32 @@ body{
     color: white;
 }
 
+.delete_order_div{
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    justify-content: center;
+}
+
+.delete_order_btn{
+    text-align: center;
+    border-radius: 20px;
+    outline: none;
+    border: none;
+    background-color: #002147;
+    padding: 0 20px;
+    color: #87CEEB;
+    height: 40px;
+}
+
 .date_place_div{
     width: 800px;
     height: 20px;
     margin-top: 15px;
-    display: flex;
+    display: grid;
     justify-content: space-around;
-    margin-left: auto;
-    margin-right: auto;
+    margin-left: 0;
+    margin-left: 45px;
 }
 
 .order_date{
@@ -89,7 +107,7 @@ body{
     display: grid;
     justify-content: center;
     gap: 20px;
-    margin-top: 25px;
+    margin-top: 40px;
 }
 
 .items_div{
@@ -114,7 +132,7 @@ body{
     margin-top: auto;
     margin-bottom: auto;
     margin-left: 25px;
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
 }
 

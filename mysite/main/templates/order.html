@@ -6,6 +6,11 @@
 
     <div class="order_num_div">
         <p class="order_num">Заказ №{{ id }}</p>
+        <form action="" class="delete_order_div"  method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="order_id" value="{{ id }}"/>
+            <input type="submit" value="Удалить заявку" class="delete_order_btn">
+        </form>
     </div>
 
     <div class="date_place_div">
@@ -23,16 +28,17 @@
 
         <div class="items_div">
 
-            <img class="img_item" src="{{ var.info.img }}">
+            <img class="img_item" src="{{ var.img }}">
 
-            <p class="name_item">{{ var.info.name_spare }}</p>
+            <p class="name_item">{{ var.name_spare }}</p>
             <p class="price_item">{{ var.count }} шт.</p>
-            <p class="price_item">{{ var.info.price }}</p>
+            <p class="price_item">{{ var.price }} ₽</p>
 
         </div>
 
+        {% empty %}
+        <p>Заявка удалена</p>
         {% endfor %}
-
 
     </div>
 

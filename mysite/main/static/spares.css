@@ -203,7 +203,7 @@ a {
 
 .spares_div{
     width: 180px;
-    height: 200px;
+    height: 220px;
     border-radius: 20px;
     background-color: #FFFAFA;
     display: flex;
@@ -223,6 +223,17 @@ a {
     height: 100px;
 }
 
+.buy_spare{
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    padding: 0 20px;
+    outline: none;
+    border: none;
+    background-color: #002147;
+    color: #87CEEB;
+    height: 40px;
+}
+
 .spare_name_div{
     justify-content: center;
     display: flex;
@@ -231,6 +242,7 @@ a {
 .spare_desc{
     text-decoration: none;
     text-align: center;
+    color: #000000;
     font-size: 14px;
     font-weight: bold;
 }

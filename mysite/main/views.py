@@ -1,59 +1,30 @@
 from django.shortcuts import render
+from .models import Spare, Order, Order_Spare
+from django.shortcuts import get_object_or_404
+import logging
+from django.db import connection
+from django.contrib.auth.models import User
 
 # Create your views here.
-
+logger = logging.getLogger(__name__)
 price_by_global = 0
 price_up_global = 0
 from_order_buck = False
+order_exist_global = False
 
 
 def get_spares(id=0, price_by='', price_up=''):
     spares = {
         'spares': [
-            {
-                'id':1,
-                'name_spare': 'Двигатель бензиновый DLE30',
-                'price': 42000,
-                'img': 'http://127.0.0.1:9000/rippic/dle30.jpg',
-                'desc': 'Бензиновый двигатель от известного производителя моторов DLE, рекомендованный для использования на небольших самолётах.',
-            },
-            {
-                'id':2,
-                'name_spare': 'Сервопривод EMAX ES08MDII',
-                'price': 1620,
-                'img': 'http://127.0.0.1:9000/rippic/emax.jpg',
-                'desc': 'Небольшой по размерам и по мощности сервопривод, Futaba/JR-совместимый.',
-            },
-            {
-                'id':3,
-                'name_spare': 'Двигатель T-Motor AT4120',
-                'price': 11980,
-                'img': 'http://127.0.0.1:9000/rippic/t-motor.jpg',
-                'desc': 'Бесколлекторный высокоэффективный двигатель, рекомендуемый к использованию с пропеллерами 15"-16".',
-            },
-            {
-                'id':4,
-                'name_spare': 'Адаптер для пропеллера',
-                'price': 42770,
-                'img': 'http://127.0.0.1:9000/rippic/adapter.jpg',
-                'desc': 'Алюминиевый адаптер для тянущих пропеллеров. Устанавливается на вал диаметром 5мм. Используется для лопастей с осевым отверстием 3 мм.',
-            },
-            {
-                'id':5,
-                'name_spare': 'Двигатель бензиновый DLE60',
-                'price': 152380,
-                'img': 'http://127.0.0.1:9000/rippic/dle60.jpg',
-                'desc': 'Бензиновый двигатель от известного производителя моторов DLE, рекомендованный для использования на больших самолётах, таких как VolJet VT10 и VolJet VT20.',
-            },
-            {
-                'id':6,
-                'name_spare': 'Модуль для программ регуляторов',
-                'price': 4540,
-                'img': 'http://127.0.0.1:9000/rippic/regul.jpg',
-                'desc': 'Модуль Hobbywing Program Card предназначен для программирования бесколлекторных регуляторов HobbyWing. Дружественный интерфейс делает программирование ESC простым и быстрым.',
-            },
         ]
     }
+
+    all_spares = Spare.objects.all()
+    for spare in all_spares:
+        spares['spares'].append(dict(id=spare.id_spare, name_spare=spare.name_spare, price=spare.price_spare, 
+                                     img=spare.url_spare, desc=spare.description_spare))
+        
+
 
     if id != 0:
         return spares['spares'][id-1]
@@ -83,36 +54,10 @@ def get_spares(id=0, price_by='', price_up=''):
     
         return new_spares
 
-def all_orders():
-    orders = { 
-        'orders': [
-            {
-                'id': 1,
-                'items': [ 
-                    {
-                        'info': get_spares(1),
-                        'count': 2,
-                    }, 
-                    {
-                        'info': get_spares(2),
-                        'count': 5,
-                    }, 
-                    {
-                        'info': get_spares(3),
-                        'count': 1,
-                    }, 
-                        ],
-                'date_for': '10.09.2024',
-                'place_for': 'Ул. Один, д. 1.',
-            }
-        ]
-    }
-
-    return orders
 
 def spares(request):
 
-    global from_order_buck, price_by_global, price_up_global
+    global from_order_buck, price_by_global, price_up_global, order_exist_global
     if from_order_buck and (price_by_global != 0 or price_up_global != 0):
         if price_by_global != 0 and price_up_global != 0:
             price_by, price_up = price_by_global, price_up_global
@@ -124,18 +69,57 @@ def spares(request):
     else:
         price_by, price_up = str(request.GET.get('price_by')), str(request.GET.get('price_up'))
 
+
     from_order_buck = False
     my_req = {
         'title': 'spares',
         'spares': get_spares(0, str(price_by), str(price_up))['spares'],
-        'id_order': all_orders()['orders'][0]['id'],
-        'count_in_order': len(all_orders()['orders'][0]['items']),
+        'id_order': get_last_order(),
+        'count_in_order': len(Order_Spare.objects.filter(id_order_mm=get_last_order())),
         'price_by': price_by if price_by != 'None' else '',
         'price_up': price_up if price_up != 'None' else '',
+        'order_exist' : order_exist_global,
     }
 
+    #logger.error(f"{request.POST.get('spare_id')}")
+    #order_exist_global = True значит был добавлен первый товар в корзину - создалась заявка
+    if request.method == "POST" and not order_exist_global:
+        order_exist_global = True
+        my_req['order_exist'] = True
+        new_order = Order(creater = User.objects.filter(is_superuser=False).first())
+        new_order.save()
+        my_req['id_order'] = get_last_order()
+        new_order_spare = Order_Spare(id_order_mm = new_order, id_spare_mm = get_object_or_404(Spare, id_spare=int(request.POST.get('spare_id'))), count=5)
+        new_order_spare.save()
+        my_req['count_in_order'] = len(Order_Spare.objects.filter(id_order_mm=get_last_order()))
+        logger.error(f"{new_order_spare.id} -> {new_order_spare}")
+
+    elif request.method == "POST":
+        new_order_spare = Order_Spare(id_order_mm = Order.objects.filter().last(), id_spare_mm = get_object_or_404(Spare, id_spare=int(request.POST.get('spare_id'))), count=5)
+        new_order_spare.save()
+        my_req['count_in_order'] = len(Order_Spare.objects.filter(id_order_mm=get_last_order()))
+
+
+    logger.error(f"{Order_Spare.objects.filter(id_order_mm = Order.objects.filter().last())}")
+
+    # if request.method == 'POST' and (not order_exist_global):
+    #     new_order = Order()
+    #     new_order.save()
+    #     new_order_spare = Order_Spare(id_order_mm = new_order, id_spare_mm = get_object_or_404(Spare, id_spare=int(request.POST.get('spare_id'))), count = 1)
+    #     new_order_spare.save()
+    #     my_req['id_order'] = new_order.id_order
+    #     order_exist_global = True
+    #     my_req['order_exist'] = order_exist_global
+    #     logger.error(f"{my_req['order_exist']} '!!!!'")
+    # elif request.method == 'POST' and order_exist_global:
+    #     exisitg_order_spare = Order_Spare(id_order_mm = get_object_or_404(Order, id_order=my_req['id_order']), id_spare_mm = get_object_or_404(Spare, id_spare=int(request.POST.get('spare_id'))), count = 1)
+    #     exisitg_order_spare.save()
+    #     logger.error(f"{my_req['order_exist']} '?????'")
 
     return render(request, 'spares.html', my_req)
+
+def get_last_order():
+    return Order.objects.filter(status_order = 0).last()
 
 def spare(request, id):
 
@@ -144,7 +128,7 @@ def spare(request, id):
 
     spare = {
         'title': 'spare',
-        'spares': get_spares(id),
+        'spares': get_spares(id-2),
     }
     
 
@@ -152,15 +136,41 @@ def spare(request, id):
 
 def order(request, id):
 
-    global from_order_buck
+    global from_order_buck, order_exist_global
     from_order_buck = True
 
-    my_req = {
-        'title': 'order',
-        'id': all_orders()['orders'][0]['id'],
-        'date_for': all_orders()['orders'][0]['date_for'],
-        'place_for': all_orders()['orders'][0]['place_for'],
-        'items': all_orders()['orders'][0]['items'],
-    }
+    if request.method == "POST":
+        logger.error(request.POST.get('order_id'))
+        with connection.cursor() as cursor:
+            cursor.execute('UPDATE "Order" SET status_order = 1 WHERE id_order = %s', [int(request.POST.get('order_id'))])
+    last_order = get_object_or_404(Order, id_order=id)
+    if last_order.status_order == 0:
+        logger.error(last_order)
+        my_req = {
+            'title': 'order',
+            'id': id,
+            'date_for': last_order.d_start,
+            'place_for': 'Ул. Первая, д. 1',
+            'items': [],
+        }
+
+        inf_order = Order_Spare.objects.filter(id_order_mm = last_order)
+        ind = 0
+        for var in inf_order:
+            my_req['items'].append(get_spares(var.id_spare_mm.id_spare-2))
+            my_req['items'][ind]['count'] = var.count
+            ind += 1
+            #logger.error(var.id_spare_mm.id_spare)
+        logger.error(my_req['items'])
+    else:
+        my_req = {
+            'title': 'order',
+            'id': id,
+            'date_for': "",
+            'place_for': "",
+            'items': [],
+        }
+
+        order_exist_global = False
 
     return render(request, 'order.html', my_req)

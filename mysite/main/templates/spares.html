@@ -15,7 +15,7 @@
             <input type="submit" value="Найти" class="sort_btn">
         </form>
     </div>
-
+    {% if order_exist == True %} 
     <div class="order_div">    
         <a href="{% url 'order' id_order  %}" class="order_a">
             <div class="btn_order">
@@ -24,6 +24,7 @@
             </div>
         </a>
     </div>
+    {% endif %} 
 
 
 
@@ -33,22 +34,31 @@
 
             {% for var in spares %}
 
-            <div class="spares_div">
-                <div class="spare_pic_div">
-                    <a href="{% url 'spare' var.id %}">
-                        <img class="spare_pic" src="{{ var.img }}">
-                    </a>
-                </div>
-                <div class="spare_name_div">
-                    <a class="spare_desc" href="{% url 'spare' var.id %}">
-                        {{ var.name_spare }}
-                    </a>
-                </div>
-                <div class="spare_price_div">
-                    <p class="spare_price">{{ var.price }} ₽</p>
+            <form method="post" action="" enctype="multipart/form-data">
+
+                {% csrf_token %}
+                <div class="spares_div">
+                    <div class="spare_pic_div">
+                        <a href="{% url 'spare' var.id %}">
+                            <img class="spare_pic" src="{{ var.img }}">
+                        </a>
+                    </div>
+                    <div class="spare_name_div">
+                        <a class="spare_desc" href="{% url 'spare' var.id %}">
+                            {{ var.name_spare }}
+                        </a>
+                    </div>
+                    <div class="spare_price_div">
+                        <p class="spare_price">{{ var.price }} ₽</p>
+                    </div>
+
+                    <input type="hidden" name="spare_id" value="{{ var.id }}"/>
+                    <input type="submit" value="Купить" class="buy_spare"/>
+
                 </div>
 
-            </div>
+
+            </form>
 
             {% empty %}
 

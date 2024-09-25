@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-61m+ufa6jvz#wk^_b*k1vz0802)j4(+%i2%xb@-^f$42du^*9#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
 
 # Application definition
@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    'django.contrib.postgres',
     'main',
 ]
 
@@ -77,8 +77,12 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',   # Используется PostgreSQL
+        'NAME': 'postgres', # Имя базы данных
+        'USER': 'postgres', # Имя пользователя
+        'PASSWORD': 'postgres', # Пароль пользователя
+        'HOST': 'pgdb', # Наименование контейнера для базы данных в Docker Compose
+        'PORT': '5432',  # Порт базы данных
     }
 }
 
@@ -105,7 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
 
