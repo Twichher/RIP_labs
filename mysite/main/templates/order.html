@@ -6,7 +6,7 @@
 
     <div class="order_num_div">
         <p class="order_num">Заказ №{{ id }}</p>
-        <form action="" class="delete_order_div"  method="POST" enctype="multipart/form-data">
+        <form action="{{ id }}/delete_order" class="delete_order_div"  method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <input type="hidden" name="order_id" value="{{ id }}"/>
             <input type="submit" value="Удалить заявку" class="delete_order_btn">

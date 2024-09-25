@@ -22,5 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.spares, name="spares"),
     path('spare/<int:id>/', views.spare, name="spare"),
+    path('spare/<int:id>/add_to_order', views.add_to_order, name="add_to_order"),
     path('order/<int:id>', views.order, name="order"),
+    path('order/<int:id>/delete_order', views.delete_order, name="delet_order"), 
 ]

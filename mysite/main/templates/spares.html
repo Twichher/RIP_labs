@@ -20,7 +20,7 @@
         <a href="{% url 'order' id_order  %}" class="order_a">
             <div class="btn_order">
                 <p class="nameorder">Корзина:{{ count_in_order }}</p>
-                <img class="img_bucket" src="http://127.0.0.1:9000/rippic/basketicon.jpg">
+                <img class="img_bucket" src="http://127.0.0.1:9000/rippic/basketicon.png">
             </div>
         </a>
     </div>
@@ -34,7 +34,7 @@
 
             {% for var in spares %}
 
-            <form method="post" action="" enctype="multipart/form-data">
+            <form method="post" action="spare/{{ var.id }}/add_to_order" enctype="multipart/form-data">
 
                 {% csrf_token %}
                 <div class="spares_div">

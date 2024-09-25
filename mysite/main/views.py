@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from .models import Spare, Order, Order_Spare
 from django.shortcuts import get_object_or_404
 import logging
@@ -23,8 +23,6 @@ def get_spares(id=0, price_by='', price_up=''):
     for spare in all_spares:
         spares['spares'].append(dict(id=spare.id_spare, name_spare=spare.name_spare, price=spare.price_spare, 
                                      img=spare.url_spare, desc=spare.description_spare))
-        
-
 
     if id != 0:
         return spares['spares'][id-1]
@@ -83,21 +81,21 @@ def spares(request):
 
     #logger.error(f"{request.POST.get('spare_id')}")
     #order_exist_global = True значит был добавлен первый товар в корзину - создалась заявка
-    if request.method == "POST" and not order_exist_global:
-        order_exist_global = True
-        my_req['order_exist'] = True
-        new_order = Order(creater = User.objects.filter(is_superuser=False).first())
-        new_order.save()
-        my_req['id_order'] = get_last_order()
-        new_order_spare = Order_Spare(id_order_mm = new_order, id_spare_mm = get_object_or_404(Spare, id_spare=int(request.POST.get('spare_id'))), count=5)
-        new_order_spare.save()
-        my_req['count_in_order'] = len(Order_Spare.objects.filter(id_order_mm=get_last_order()))
-        logger.error(f"{new_order_spare.id} -> {new_order_spare}")
+    # if request.method == "POST" and not order_exist_global:
+    #     order_exist_global = True
+    #     my_req['order_exist'] = True
+    #     new_order = Order()
+    #     new_order.save()
+    #     my_req['id_order'] = get_last_order()
+    #     new_order_spare = Order_Spare(id_order_mm = new_order, id_spare_mm = get_object_or_404(Spare, id_spare=int(request.POST.get('spare_id'))), count=1)
+    #     new_order_spare.save()
+    #     my_req['count_in_order'] = len(Order_Spare.objects.filter(id_order_mm=get_last_order()))
+    #     logger.error(f"{new_order_spare.id} -> {new_order_spare}")
 
-    elif request.method == "POST":
-        new_order_spare = Order_Spare(id_order_mm = Order.objects.filter().last(), id_spare_mm = get_object_or_404(Spare, id_spare=int(request.POST.get('spare_id'))), count=5)
-        new_order_spare.save()
-        my_req['count_in_order'] = len(Order_Spare.objects.filter(id_order_mm=get_last_order()))
+    # elif request.method == "POST":
+    #     new_order_spare = Order_Spare(id_order_mm = Order.objects.filter().last(), id_spare_mm = get_object_or_404(Spare, id_spare=int(request.POST.get('spare_id'))), count=5)
+    #     new_order_spare.save()
+    #     my_req['count_in_order'] = len(Order_Spare.objects.filter(id_order_mm=get_last_order()))
 
 
     logger.error(f"{Order_Spare.objects.filter(id_order_mm = Order.objects.filter().last())}")
@@ -118,6 +116,32 @@ def spares(request):
 
     return render(request, 'spares.html', my_req)
 
+
+def add_to_order(request, id):
+    logger.error("redirect ro add_to_order")
+    global order_exist_global
+    if request.method == "POST" and not order_exist_global:
+        order_exist_global = True
+        new_order = Order()
+        new_order.save()
+        new_order_spare = Order_Spare(id_order_mm = new_order, id_spare_mm = get_object_or_404(Spare, id_spare=id), count=1)
+        new_order_spare.save()
+        logger.error(f"{new_order_spare.id} -> {new_order_spare}")
+    elif request.method == "POST":
+        new_order_spare = Order_Spare(id_order_mm = Order.objects.filter().last(), id_spare_mm = get_object_or_404(Spare, id_spare=int(request.POST.get('spare_id'))), count=5)
+        new_order_spare.save()
+    return redirect("/")
+
+def delete_order(request, id):
+    logger.error("redirect ro delete_order")
+    global order_exist_global
+    order_exist_global = False
+    if request.method == "POST":
+        logger.error(request.POST.get('order_id'))
+        with connection.cursor() as cursor:
+            cursor.execute('UPDATE "Order" SET status_order = 1 WHERE id_order = %s', [id])
+    return redirect('/')
+
 def get_last_order():
     return Order.objects.filter(status_order = 0).last()
 
@@ -131,7 +155,6 @@ def spare(request, id):
         'spares': get_spares(id-2),
     }
     
-
     return render(request, 'spare.html', spare)
 
 def order(request, id):
@@ -139,10 +162,7 @@ def order(request, id):
     global from_order_buck, order_exist_global
     from_order_buck = True
 
-    if request.method == "POST":
-        logger.error(request.POST.get('order_id'))
-        with connection.cursor() as cursor:
-            cursor.execute('UPDATE "Order" SET status_order = 1 WHERE id_order = %s', [int(request.POST.get('order_id'))])
+
     last_order = get_object_or_404(Order, id_order=id)
     if last_order.status_order == 0:
         logger.error(last_order)
