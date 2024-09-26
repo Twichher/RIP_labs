@@ -122,7 +122,9 @@ def add_to_order(request, id):
     global order_exist_global
     if request.method == "POST" and not order_exist_global:
         order_exist_global = True
-        new_order = Order()
+        new_order = Order(creater = User.objects.filter(is_superuser=False).first(), adminer = User.objects.filter(is_superuser=True).first())
+        logger.error(User.objects.filter(is_superuser=False).first())
+        logger.error(User.objects.filter(is_superuser=True).first())
         new_order.save()
         new_order_spare = Order_Spare(id_order_mm = new_order, id_spare_mm = get_object_or_404(Spare, id_spare=id), count=1)
         new_order_spare.save()
