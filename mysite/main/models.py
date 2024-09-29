@@ -1,6 +1,9 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
+import logging
+logger = logging.getLogger(__name__)
     
 class Spare(models.Model):
     STATUS_CHOICES = [
@@ -47,8 +50,11 @@ class Order(models.Model):
     def __str__(self) -> str:
         return str(self.id_order)
 
-    def get_id_order(self):
-        return self.id_order
+    def get_count_in_order(self):
+        itmes = []
+        for item in  Order_Spare.objects.filter(id_order_mm=self):
+            itmes.append(item.id_spare_mm)
+        return itmes
     
     class Meta:
         verbose_name = 'Заказ'

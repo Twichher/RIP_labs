@@ -163,6 +163,16 @@ a {
     margin-bottom: auto;
 }
 
+.btn_order_false{
+    width: 149px;
+    height: 40px;
+    background-color: #002147;
+    border-radius: 20px;
+    display: flex;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
 .nameorder{
     outline: none;
     border: none;

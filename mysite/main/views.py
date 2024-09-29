@@ -73,9 +73,9 @@ def spares(request):
         'title': 'spares',
         'spares': get_spares(0, str(price_by), str(price_up))['spares'],
         'id_order': get_last_order(),
-        'count_in_order': len(Order_Spare.objects.filter(id_order_mm=get_last_order())),
+        'count_in_order': len(get_last_order().get_count_in_order()),
         'price_by': price_by if price_by != 'None' else '',
-        'price_up': price_up if price_up != 'None' else '',
+        'price_up': price_up if price_up != 'None' else '', 
         'order_exist' : order_exist_global,
     }
 
@@ -128,9 +128,10 @@ def add_to_order(request, id):
         new_order.save()
         new_order_spare = Order_Spare(id_order_mm = new_order, id_spare_mm = get_object_or_404(Spare, id_spare=id), count=1)
         new_order_spare.save()
+        new_order.get_count_in_order()
         logger.error(f"{new_order_spare.id} -> {new_order_spare}")
     elif request.method == "POST":
-        new_order_spare = Order_Spare(id_order_mm = Order.objects.filter().last(), id_spare_mm = get_object_or_404(Spare, id_spare=int(request.POST.get('spare_id'))), count=5)
+        new_order_spare = Order_Spare(id_order_mm = Order.objects.filter().last(), id_spare_mm = get_object_or_404(Spare, id_spare=int(request.POST.get('spare_id'))), count=1)
         new_order_spare.save()
     return redirect("/")
 
@@ -174,6 +175,7 @@ def order(request, id):
             'date_for': last_order.d_start,
             'place_for': 'Ул. Первая, д. 1',
             'items': [],
+            'can_delete': 'True'
         }
 
         inf_order = Order_Spare.objects.filter(id_order_mm = last_order)
@@ -191,6 +193,7 @@ def order(request, id):
             'date_for': "",
             'place_for': "",
             'items': [],
+            'can_delete': 'False',
         }
 
         order_exist_global = False
