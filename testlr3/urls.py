@@ -26,14 +26,20 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path(r'spares/', views.SpareList.as_view(), name='stocks-list'), 
-    path(r'spare/<int:pk>/', views.SpareDetail.as_view(), name='spare-detail'),
+    path(r'spares/<int:pk>/', views.SpareDetail.as_view(), name='spare-detail'),
+    path('spares/<int:pk>/add_new_pic/', views.post_new_pic_spare, name='new pic to spare'),
 
-    path(r'user/reg/', views.UserReg.as_view(), name='user-reg'),
-    path(r'user/login/', views.UserLogin.as_view(), name='user-login'),
-    path(r'user/logout/', views.UserLogout.as_view(), name='user-logout'),
+    # path(r'user/reg/', views.UserReg.as_view(), name='user-reg'),
+    # path(r'user/login/', views.UserLogin.as_view(), name='user-login'),
+    path(r'user/', views.UserLogout.as_view(), name='user-logout'),
+    path('user/register/', views.register_user, name='user-reg'),
 
     path(r'orders/', views.JetOrdersList.as_view(), name='user-logout'),
-    path(r'order/<int:pk>/', views.JetOrderInfo.as_view(), name='user-logout'),
+    path(r'orders/<int:pk>/', views.JetOrderInfo.as_view(), name='user-logout'),
+    path('orders/<int:pk>/put_info/', views.put_add_info, name='order put add info'),
+    path('orders/<int:pk>/form_by_creater/', views.put_form_creater, name='form by creater'),
+    path('orders/<int:pk>/form_by_adminer/', views.put_from_adminer, name='form by adminer'),
+    path('orders/<int:pk>/delete/', views.delete_order, name='delete order'),
 
     path(r'orderspare/<int:opk>/<int:spk>/', views.JetOrderSpareDetail.as_view(), name='user-logout'),
 

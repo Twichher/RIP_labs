@@ -37,7 +37,7 @@ class JetOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Jet_Order
         fields = ['id_order', 'status_order', 'd_start', 
-                  'd_form', 'd_compl', 'creater', 'adminer']
+                  'd_form', 'd_compl', 'creater', 'adminer', 'pick_up_point']
         
 
 class JetOrderSpareSerializer(serializers.ModelSerializer):
@@ -46,6 +46,6 @@ class JetOrderSpareSerializer(serializers.ModelSerializer):
     id_spare_mm = serializers.StringRelatedField(read_only=True)
 
     class Meta:
-        model = Order_Spare
+        model = Jet_Order_Spare
         fields = ['id_order_mm', 'id_spare_mm', 'count']
     

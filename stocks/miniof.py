@@ -35,3 +35,21 @@ def add_pic(new_spare, pic):
     
 
     return Response({"message": "success"})
+
+
+def delete_pic(spare):
+    client = Minio(           
+        endpoint=settings.AWS_S3_ENDPOINT_URL,
+        access_key=settings.AWS_ACCESS_KEY_ID,
+        secret_key=settings.AWS_SECRET_ACCESS_KEY,
+        secure=settings.MINIO_USE_SSL
+    )
+
+    try:
+        name_pic = spare.url_spare.split('/')[-1]
+        logger.error(name_pic)
+        client.remove_object(bucket_name='logo', object_name=name_pic)
+
+        return True
+    except:
+        return False

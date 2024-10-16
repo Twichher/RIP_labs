@@ -43,7 +43,7 @@ class Spare(models.Model):
     status_spare = models.IntegerField(choices=STATUS_CHOICES, default=0, verbose_name='Статус')
     url_spare = models.TextField(max_length=200, verbose_name='URL', null=True, blank=True)
     price_spare = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Цена')
-
+ 
     def __str__(self):
         return self.name_spare
     
@@ -73,20 +73,28 @@ class Jet_Order(models.Model):
     creater = models.ForeignKey('AuthUser', verbose_name= "Создатель", on_delete=models.DO_NOTHING, null=True, blank=False,related_name='creater')
     adminer = models.ForeignKey('AuthUser', verbose_name= "Модератор", on_delete=models.DO_NOTHING, null=True, related_name='moderator')
 
+    pick_up_point = models.CharField(max_length=255, verbose_name='Пункт выдачи', null=True, blank=True)
+
     def __str__(self) -> str:
         return str(self.id_order)
 
     def get_count_in_order(self):
         itmes = []
-        for item in  Order_Spare.objects.filter(id_order_mm=self):
+        for item in  Jet_Order_Spare.objects.filter(id_order_mm=self):
             itmes.append(item.id_spare_mm)
         return itmes
     
+    def get_count_by_count(self):
+        items = 0
+        for item in  Jet_Order_Spare.objects.filter(id_order_mm=self):
+            items += item.count
+        return items
+    
     def get_price_of_order(self):
         price = 0
-        for item in Order_Spare.objects.filter(id_order_mm=self):
+        for item in Jet_Order_Spare.objects.filter(id_order_mm=self):
             spare = get_object_or_404(Spare, id_spare = item.id_spare_mm.id_spare)
-            price += spare.price_spare
+            price += spare.price_spare * item.count
         return price
     
     class Meta:
@@ -94,7 +102,7 @@ class Jet_Order(models.Model):
         verbose_name_plural = 'Заказы'
         db_table = 'Order'
 
-class Order_Spare(models.Model):
+class Jet_Order_Spare(models.Model):
     id_order_mm = models.ForeignKey(Jet_Order, on_delete=models.CASCADE)
     id_spare_mm = models.ForeignKey(Spare, on_delete=models.CASCADE)
 

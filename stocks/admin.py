@@ -5,4 +5,4 @@ from .models import *
 
 admin.site.register(Spare)
 admin.site.register(Jet_Order)
-admin.site.register(Order_Spare)
+admin.site.register(Jet_Order_Spare)
