@@ -73,7 +73,7 @@ class SpareList(APIView):
         order = Jet_Order.objects.filter(creater=get_user(), status_order=0).last() #заказ данного юзера в статусе черновик
         logger.error(order)
         if order is None: 
-            return Response({"Jet_order": "None",
+            return Response({"Jet_order": "null",
                              "Count in Jet_order": 0,
                              "Spares list" : serializer.data})
         else:
@@ -88,9 +88,11 @@ class SpareList(APIView):
         if serializer.is_valid():
             spare = serializer.save(url_spare='')
             pic = request.FILES.get("pic_spare")
-            pic_result = add_pic(spare, pic)
-            if 'error' in pic_result.data:
-                return pic_result
+            if pic is not None:
+                pic_result = add_pic(spare, pic)
+                if 'error' in pic_result.data:
+                    return pic_result
+            spare.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         #logger.error(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -180,7 +182,7 @@ class SpareDetail(APIView):
             return Response({"Message":"Spare is deleted"}, status=status.HTTP_204_NO_CONTENT)
         else:
             spare.delete()
-            return Response({"Message":"Error"})
+            return Response({"Message":"Spare is deleted"})
     
 
 @api_view(["POST"])
