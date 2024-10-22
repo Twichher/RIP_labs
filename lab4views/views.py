@@ -72,7 +72,7 @@ def login_user(request):
 def logout_user(request):
     try:
         username = session_storage.get(request.COOKIES["session_id"])
-        username = username.decode('utf-8') if username else None
+        username = username.decode('utf-8')
         logout(request._request)
         logger.error(username)
         response = Response({'Message': f'{username} вышел из системы'})
@@ -88,7 +88,7 @@ def logout_user(request):
 def private_user(request):
     try:
         username = session_storage.get(request.COOKIES["session_id"])
-        username = username.decode('utf-8') if username else None
+        username = username.decode('utf-8')
     except:
         return Response({"Message":"Нет авторизованных пользователей"})
     
@@ -112,7 +112,7 @@ def private_user(request):
 def whoami(request):
     try:
         username = session_storage.get(request.COOKIES["session_id"])
-        username = username.decode('utf-8') if username else None
+        username = username.decode('utf-8')
     except:
         return Response({"Message":"Нет авторизованных пользователей"})
     
@@ -125,7 +125,7 @@ def whoami(request):
 def list_spares(request):
     try:
         username = session_storage.get(request.COOKIES["session_id"])
-        username = username.decode('utf-8') if username else None
+        username = username.decode('utf-8') 
     except:
         username = ''
     
@@ -194,7 +194,7 @@ def new_spare(request):
 def to_order_spare(request, pk):
     try:
         username = session_storage.get(request.COOKIES["session_id"])
-        username = username.decode('utf-8') if username else None
+        username = username.decode('utf-8')
     except:
         return Response({"Message":"Нет авторизованных пользователей"})
     
