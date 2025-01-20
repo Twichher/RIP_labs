@@ -17,6 +17,21 @@ session_storage = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDI
 #         user = AuthUser.objects.filter(username=username)
 #         return bool(user.is_superuser or user.is_staff)
 
+class IsAuthenticated(permissions.BasePermission):
+    def has_permission(self, request, view):
+        try:
+            username = session_storage.get(request.COOKIES["session_id"])
+            username = username.decode('utf-8')
+        except:
+            return False
+        
+        try:
+            user = get_object_or_404(AuthUser,username=username)
+            return True
+        except:
+            return False
+
+
 class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
         try:

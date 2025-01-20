@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from .miniof import *
 import logging
 from django.contrib.auth import authenticate, login, logout
-from rest_framework.permissions import IsAuthenticated
+# from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 import datetime
@@ -53,18 +53,21 @@ def login_user(request):
     except:
         username = str(request.data["username"]) 
         password = request.data["password"]
-        user = authenticate(request, username=username, password=password)
+        if not AuthUser.objects.filter(username = username).exists():
+            return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+        user = authenticate(request, username=username, password=password)  
         logger.error(user)
+        logger.error(isinstance(user, AuthUser)) 
         if user is not None:
             random_key = str(uuid.uuid4()) 
             session_storage.set(random_key, username)
 
-            response = Response({'status': f'{username} успешно вошел в систему'})
+            response = Response({"username" : {username}, 'status': f'{username} успешно вошел в систему', "session_id" : random_key})
             response.set_cookie("session_id", random_key)
 
             return response
         else:
-            return HttpResponse("{'status': 'error', 'error': 'login failed'}")
+            return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     
 
 @permission_classes([IsAuthenticated])
@@ -97,12 +100,24 @@ def private_user(request):
     
     user = get_object_or_404(AuthUser, username = username)
 
-    serializer = UserPrivateSerializer(user, data=request.data, partial=True)
+    mutable_data = request.data.copy()
+
+    if 'password' in mutable_data:
+        if isinstance(mutable_data['password'], str):
+            new_password = mutable_data.pop('password') 
+        else:
+            new_password = mutable_data.pop('password')[0]
+        logger.error(f"new password = {new_password}")
+        user.set_password(new_password)  
+        user.save()  
+
+    serializer = UserPrivateSerializer(user, data=mutable_data, partial=True)
     if not serializer.is_valid():
         return Response(status=status.HTTP_409_CONFLICT)
+    
 
     serializer.save()
-    logger.error(serializer.data)
+    # logger.error(serializer.data)
 
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -189,6 +204,7 @@ def new_spare(request):
     
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+# @csrf_exempt
 @api_view(["POST"]) 
 @permission_classes([IsAuthenticated])
 def to_order_spare(request, pk):
@@ -258,31 +274,31 @@ def list_orders(request):
     except:
         return Response(status=status.HTTP_401_UNAUTHORIZED)
     
-    find_d_form_by = request.data.get('d_form_by')
-    find_d_form_up = request.data.get('d_form_up')  
-    find_status = int(request.data.get('status_order', -1))
+    find_d_form_by = request.query_params.get('find_d_form_by')
+    find_d_form_up = request.query_params.get('find_d_form_up')  
+    find_status = int(request.query_params.get('find_status', -1))
 
-    user = get_object_or_404(AuthUser, username = username)
-    orders = Jet_Order.objects.filter(creater = user)
-
+    user = get_object_or_404(AuthUser, username=username)
+    orders = Jet_Order.objects.filter(creater=user)
 
     if find_status in [0, 1]:
-        return Response({"Message":"Удаленые или черновики просматривать нельзя"})
+        return Response({"Message": "Удаленые или черновики просматривать нельзя"})
 
     if find_status == -1:
         find_status = 2
-        orders = orders.filter(status_order__gte = find_status)
+        orders = orders.filter(status_order__gte=find_status)
     else:
-        orders = orders.filter(status_order = find_status)
+        orders = orders.filter(status_order=find_status)
 
     if find_d_form_by is not None and parse_datetime(find_d_form_by):
-        orders = orders.filter(d_form__gte = parse_datetime(find_d_form_by))
+        orders = orders.filter(d_form__gte=parse_datetime(find_d_form_by))
         
     if find_d_form_up is not None and parse_datetime(find_d_form_up):
-        orders = orders.filter(d_form__lte = parse_datetime(find_d_form_up))
+        orders = orders.filter(d_form__lte=parse_datetime(find_d_form_up))
 
     serializer = JetOrderSerializer(orders, many=True)
-    return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 @permission_classes([IsAuthenticated])
@@ -313,7 +329,7 @@ def get_order(request, pk):
                         "count" : ordsp.count})
     
     return Response({"data" : serializer.data,
-                    "count in order" : order.get_count_by_count(),
+                    "count_in_order" : order.get_count_by_count(),
                     "spares": spares})
 
 
@@ -450,6 +466,9 @@ def new_count_orderspare(request, opk, spk, format=None):
                                     id_order_mm = order, 
                                     id_spare_mm = spare)
     
+    logger.error(request.data.get("count"))
+    if (int(request.data.get("count"))) <= 0:
+        return Response(status=status.HTTP_403_FORBIDDEN)
     serializer = JetOrderSpareCountSerializer(order_spare, data = request.data, partial=True)
     serializer.is_valid(raise_exception=True)
     serializer.save()

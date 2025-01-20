@@ -41,7 +41,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'django.contrib.staticfiles',  #Необходим для  swagger ui's css/js файлов (По умолчанию включен)
     'drf_yasg',
+    'corsheaders',
 ]
+
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -57,6 +60,7 @@ REST_FRAMEWORK = {
 # }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -65,6 +69,21 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+    
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Адрес фронтенда
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_COOKIE_HTTPONLY = False 
+CSRF_USE_SESSIONS = False 
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",  # Адрес вашего фронтенда
+]
+
 
 ROOT_URLCONF = 'lab4set.urls'
 

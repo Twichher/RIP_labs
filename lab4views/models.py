@@ -70,7 +70,7 @@ class Jet_Order(models.Model):
     creater = models.ForeignKey('AuthUser', verbose_name= "Создатель", on_delete=models.DO_NOTHING, null=True, blank=False,related_name='creater')
     adminer = models.ForeignKey('AuthUser', verbose_name= "Модератор", on_delete=models.DO_NOTHING, null=True, related_name='moderator')
 
-    price_order = models.IntegerField(default=0, verbose_name='Цена заказа')
+    price_order = models.IntegerField(default=00, verbose_name='Цена заказа')
     pick_up_point = models.CharField(max_length=255, verbose_name='Пункт выдачи', null=True, blank=True)
 
     def __str__(self) -> str:
@@ -96,6 +96,7 @@ class Jet_Order(models.Model):
         return price
     
     class Meta:
+        managed = True
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
         db_table = 'Order'
